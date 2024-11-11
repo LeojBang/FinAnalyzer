@@ -1,12 +1,10 @@
 import datetime
 import json
 import os
-from typing import Any
 
 import pandas as pd
 import requests
 from dotenv import load_dotenv
-from pandas import Series
 
 from src.logger import setup_logger
 
