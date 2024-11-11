@@ -1,11 +1,12 @@
+import datetime
 import json
 import os
-from datetime import datetime
+from typing import Any
 
 import pandas as pd
 import requests
 from dotenv import load_dotenv
-from pandas import DataFrame
+from pandas import Series
 
 from src.logger import setup_logger
 
@@ -32,23 +33,30 @@ def read_excel_file(file_path_operations: str = default_file_path_to_operations)
         raise FileNotFoundError
 
 
-def filter_transactions_by_date(transactions: DataFrame, date: str | datetime) -> DataFrame:
+def filter_transactions_by_date(transactions: pd.DataFrame, date_str: str) -> pd.DataFrame:
     """Функция принимает список словарей с транзакциями и дату
     фильтрует транзакции с начала месяца, на который выпадает входящая дата по входящую дату."""
-    logger.info(f"Фильтрую транзакции по дате {date}")
-    date = datetime.strptime(date, "%d.%m.%Y")
-    transactions["Дата платежа"] = pd.to_datetime(transactions["Дата платежа"], format="%d.%m.%Y", errors="coerce")
+    logger.info(f"Фильтрую транзакции по дате {date_str}")
+
+    date = datetime.datetime.strptime(date_str, "%d.%m.%Y")
+
+    transactions["Дата операции"] = pd.to_datetime(
+        transactions["Дата операции"], format="%d.%m.%Y %H:%M:%S", errors="coerce"
+    )
     filtered_operations = transactions.loc[
-        (transactions["Дата платежа"].dt.month == date.month) & (transactions["Дата платежа"].dt.date == date.date())
+        (transactions["Дата операции"].dt.month == date.month) & (transactions["Дата операции"].dt.year == date.year)
     ]
-    filtered_operations.loc[:, "Дата платежа"] = filtered_operations["Дата платежа"].dt.strftime("%m.%d.%Y")
+    filtered_operations = filtered_operations.copy()
+    filtered_operations["Дата операции"] = filtered_operations["Дата операции"].apply(
+        lambda x: x.strftime("%d.%m.%Y %H:%M:%S") if pd.notnull(x) else None
+    )
     logger.info(f"Фильтрация завершилась успешно. Нашлось {len(filtered_operations)} операций")
     return filtered_operations
 
 
 def get_greeting() -> str:
     """Функция приветствует в зависимости от времени суток"""
-    time_now = datetime.now().hour
+    time_now = datetime.datetime.now().hour
     logger.info(f"Получил время {time_now}. Составляю приветствие...")
     if 6 <= time_now < 12:
         logger.info("Утреннее приветствие сгенерировано")
@@ -64,7 +72,7 @@ def get_greeting() -> str:
         return "Доброй ночи"
 
 
-def card_info(data: DataFrame) -> list:
+def card_info(data: pd.DataFrame) -> list:
     """
     Функция принимает DataFrame.
     Возвращает список словарей из: последние 4 цифры карты, общая сумма расходов, кешбэк (1 рубль на каждые 100 рублей)
@@ -82,13 +90,13 @@ def card_info(data: DataFrame) -> list:
     return cards
 
 
-def top_five_transactions_by_payment_amount(data: DataFrame) -> list:
+def top_five_transactions_by_payment_amount(data: pd.DataFrame) -> list:
     """Функция принимает DataFrame и возвращает топ 5 транзакций в виде списка словарей"""
     logger.info("Составляю топ 5 транзакций по столбцу 'Сумма операции'")
 
-    top_transactions = data.nlargest(5, "Сумма операции")[["Дата платежа", "Сумма операции", "Категория", "Описание"]]
+    top_transactions = data.nlargest(5, "Сумма операции")[["Дата операции", "Сумма операции", "Категория", "Описание"]]
 
-    top_transactions["Дата платежа"] = top_transactions["Дата платежа"].dt.strftime("%d.%m.%Y")
+    # top_transactions["Дата платежа"] = top_transactions["Дата платежа"].dt.strftime("%d.%m.%Y")
     logger.info("Список словарей из топ 5 транзакций успешно сгенерирован")
     return top_transactions.to_dict(orient="records")
 
@@ -128,7 +136,6 @@ def get_stock_prices() -> list:
 
     r = requests.get(url)
     data_stocks = r.json()
-
     logger.info(f"Запрос получен. Статус код {r.status_code}")
     stock_prices = [
         {"stock": stock["symbol"], "price": stock["price"]}

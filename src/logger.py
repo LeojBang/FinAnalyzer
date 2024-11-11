@@ -1,8 +1,9 @@
 import logging
 import os
+from logging import Logger
 
 
-def setup_logger(name_module: str, file_name: str):
+def setup_logger(name_module: str, file_name: str) -> Logger:
     # Определяем путь к файлу логов относительно текущего файла
     log_dir = os.path.join(os.path.dirname(__file__), "../logs")
     os.makedirs(log_dir, exist_ok=True)
