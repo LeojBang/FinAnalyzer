@@ -22,20 +22,20 @@ def test_read_excel_file_invalid_path_file() -> None:
     with pytest.raises(FileNotFoundError):
         read_excel_file("test_path.xlsx")
 
-
+@pytest.mark.parametrize(
+    "hour, expected_greeting",
+    [
+        (datetime(2024, 12, 1, 12), "Добрый день"),
+        (datetime(2024, 12, 1, 18), "Добрый вечер"),
+        (datetime(2024, 12, 1, 4), "Доброй ночи"),
+        (datetime(2024, 12, 1, 6), "Доброе утро"),
+    ],
+    ids=["Приветствие днем","Приветствие вечером","Приветствие ночью","Приветствие утром"]
+)
 @patch("datetime.datetime")
-def test_get_greeting(mock_date: Mock) -> None:
-    mock_date.now.return_value = datetime(2024, 12, 1, 12)
-    assert get_greeting() == "Добрый день"
-
-    mock_date.now.return_value = datetime(2024, 12, 1, 6)
-    assert get_greeting() == "Доброе утро"
-
-    mock_date.now.return_value = datetime(2024, 12, 1, 18)
-    assert get_greeting() == "Добрый вечер"
-
-    mock_date.now.return_value = datetime(2024, 12, 1, 4)
-    assert get_greeting() == "Доброй ночи"
+def test_get_greeting(mock_date: Mock,hour,expected_greeting) -> None:
+    mock_date.now.return_value = hour
+    assert get_greeting() == expected_greeting
 
 
 @patch("requests.get")
@@ -118,5 +118,4 @@ def test_filter_transactions_by_date(sample_transactions: pd.DataFrame) -> None:
     assert len(filtered_df) == 3, "Должно быть три транзакции за ноябрь 2024"
 
     # Проверка содержимого DataFrame
-    # assert isinstance(filtered_df, pd.DataFrame), "Ожидается DataFrame"
     assert_frame_equal(filtered_df.reset_index(drop=True), expected_df)

@@ -22,7 +22,7 @@ logger = setup_logger("utils", "../logs/utils")
 def read_excel_file(file_path_operations: str = default_file_path_to_operations) -> pd.DataFrame:
     """Функция принимает путь до EXCEL-файла и возвращает DataFrame"""
     try:
-        logger.info(f"Попытка прочтения файла: {file_path_operations[-19::]}")
+        logger.info(f"Попытка прочтения файла: {file_path_operations[-21::]}")
         operations = pd.read_excel(file_path_operations)
         logger.info("Файл успешно записан в формат DataFrame")
         return operations
@@ -36,7 +36,7 @@ def filter_transactions_by_date(transactions: pd.DataFrame, date_str: str) -> pd
     фильтрует транзакции с начала месяца, на который выпадает входящая дата по входящую дату."""
     logger.info(f"Фильтрую транзакции по дате {date_str}")
 
-    date = datetime.datetime.strptime(date_str, "%d.%m.%Y")
+    date = datetime.datetime.strptime(date_str, "%d.%m.%Y %H:%M:%S")
 
     transactions["Дата операции"] = pd.to_datetime(
         transactions["Дата операции"], format="%d.%m.%Y %H:%M:%S", errors="coerce"

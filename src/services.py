@@ -16,7 +16,7 @@ def investment_bank(month: str, transactions: list[dict[Hashable, Any]], limit: 
     date = datetime.datetime.strptime(month, "%Y-%m")
     logger.info(f"Запускаю расчет инвесткопилки для месяца {date.month} с лимитом {limit}")
     sum_investment_bank = 0.0
-    print(transactions)
+
     for transaction in transactions:
         transaction_date_to_datetime = datetime.datetime.strptime(transaction["Дата операции"], "%d.%m.%Y %H:%M:%S")
 
