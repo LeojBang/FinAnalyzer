@@ -5,13 +5,12 @@ from typing import Any, Callable
 
 import pandas as pd
 
+from config import REPORTS_DIR
 from src.logger import setup_logger
 
-logger = setup_logger("reports", "../logs/reports")
-func_operation_reports = os.path.join(os.path.dirname(__file__), "../data/reports/func_operation.json")
-default_path_func_operation_reports = os.path.join(
-    os.path.dirname(__file__), "../data/reports/default_func_operation_report.json"
-)
+logger = setup_logger("reports")
+func_operation_reports = os.path.join(REPORTS_DIR, "func_operation.json")
+default_path_func_operation_reports = os.path.join(REPORTS_DIR, "default_func_operation_report.json")
 
 
 def report_write_to_default_file(func: Callable) -> Callable:
@@ -27,16 +26,20 @@ def report_write_to_default_file(func: Callable) -> Callable:
     return wrapper
 
 
-def report_write_to_file(file_path: str) -> Callable:
+def report_write_to_file(file_path: str | None = None) -> Callable:
     """Записывает в переданный файл результат, который возвращает функция, формирующая отчет."""
 
     def my_decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args: tuple, **kwargs: dict) -> Any:
             result = func(*args, **kwargs)
-            logger.info(f"Записываю получившийся результат функции {func.__name__} в файл {file_path}")
-            result.to_json(file_path, orient="records", force_ascii=False, indent=4)
-            return result
+            if file_path:
+                logger.info(f"Записываю получившийся результат функции {func.__name__} в файл {file_path}")
+                result.to_json(file_path, orient="records", force_ascii=False, indent=4)
+                return result
+            else:
+                logger.info(f"Получившийся результат функции {func.__name__} вывожу в терминал")
+                return result.to_json(force_ascii=False, indent=4, orient="records")
 
         return wrapper
 

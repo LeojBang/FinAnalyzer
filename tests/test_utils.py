@@ -101,7 +101,7 @@ def test_top_five_transactions_by_payment_amount(trans_data: dict) -> None:
 
 def test_filter_transactions_by_date(sample_transactions: pd.DataFrame) -> None:
     """Тестируем фильтрацию транзакций по указанной дате."""
-    date = "15.11.2024"
+    date = "15.11.2024 00:00:00"
     expected_data = {
         "Дата операции": [
             "01.11.2024 10:15:30",

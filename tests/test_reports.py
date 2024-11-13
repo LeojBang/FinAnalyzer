@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.reports import spending_by_category
+from src.reports import spending_by_category, report_write_to_file, func_operation_reports
 
 
 def test_spending_by_category(tmp_path: Path, sample_transactions_to_decorator: pd.DataFrame) -> None:

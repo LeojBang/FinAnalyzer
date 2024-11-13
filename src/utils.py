@@ -6,16 +6,17 @@ import pandas as pd
 import requests
 from dotenv import load_dotenv
 
+from config import DATA_DIR, ROOT_DIR
 from src.logger import setup_logger
 
 load_dotenv()
 HEADERS = {"apikey": os.getenv("API_KEY_CURRENCY")}
 API_KEY_STOCK = os.getenv("API_KEY_STOCK")
 
-default_file_path_to_operations = os.path.join(os.path.dirname(__file__), "../data/operations.xlsx")
-file_path_user_settings = os.path.join(os.path.dirname(__file__), "../user_settings.json")
+default_file_path_to_operations = os.path.join(DATA_DIR, "operations.xlsx")
+file_path_user_settings = os.path.join(ROOT_DIR, "user_settings.json")
 
-logger = setup_logger("utils", "../logs/utils")
+logger = setup_logger("utils")
 
 
 # pypi pytest mock, pytest freezer(time), tmp path, faker(random name example)
