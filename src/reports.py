@@ -14,6 +14,8 @@ default_path_func_operation_reports = os.path.join(REPORTS_DIR, "default_func_op
 
 
 def report_write_to_default_file(func: Callable) -> Callable:
+    """Записывает результат оборачиваемой функции в файл по умолчанию."""
+
     def wrapper(*args: tuple, **kwargs: dict) -> Any:
         result = func(*args, **kwargs)
         with open(f"{default_path_func_operation_reports}", "w") as file:
@@ -38,15 +40,18 @@ def report_write_to_file(file_path: str | None = None) -> Callable:
                 result.to_json(file_path, orient="records", force_ascii=False, indent=4)
                 return result
             else:
-                logger.info(f"Получившийся результат функции {func.__name__} вывожу в терминал")
-                return result.to_json(force_ascii=False, indent=4, orient="records")
+                logger.info(
+                    f"Получившийся результат функции {func.__name__} в файл {default_path_func_operation_reports}"
+                )
+                result.to_json(default_path_func_operation_reports, orient="records", force_ascii=False, indent=4)
+                return result
 
         return wrapper
 
     return my_decorator
 
 
-@report_write_to_file(func_operation_reports)
+@report_write_to_file()
 def spending_by_category(transactions: pd.DataFrame, category: str, date: Any = None) -> Any:
     """
     Возвращает траты по заданной категории за последние три месяца от переданной даты.

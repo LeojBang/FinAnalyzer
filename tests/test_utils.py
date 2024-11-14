@@ -33,7 +33,7 @@ def test_read_excel_file_invalid_path_file() -> None:
     ids=["Приветствие днем","Приветствие вечером","Приветствие ночью","Приветствие утром"]
 )
 @patch("datetime.datetime")
-def test_get_greeting(mock_date: Mock,hour,expected_greeting) -> None:
+def test_get_greeting(mock_date: Mock,hour: datetime,expected_greeting: str) -> None:
     mock_date.now.return_value = hour
     assert get_greeting() == expected_greeting
 
