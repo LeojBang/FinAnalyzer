@@ -1,30 +1,29 @@
 import datetime
 import json
 import os
-from typing import Any
 
 import pandas as pd
 import requests
 from dotenv import load_dotenv
-from pandas import Series
 
+from config import DATA_DIR, ROOT_DIR
 from src.logger import setup_logger
 
 load_dotenv()
 HEADERS = {"apikey": os.getenv("API_KEY_CURRENCY")}
 API_KEY_STOCK = os.getenv("API_KEY_STOCK")
 
-default_file_path_to_operations = os.path.join(os.path.dirname(__file__), "../data/operations.xlsx")
-file_path_user_settings = os.path.join(os.path.dirname(__file__), "../user_settings.json")
+default_file_path_to_operations = os.path.join(DATA_DIR, "operations.xlsx")
+file_path_user_settings = os.path.join(ROOT_DIR, "user_settings.json")
 
-logger = setup_logger("utils", "../logs/utils")
+logger = setup_logger("utils")
 
 
 # pypi pytest mock, pytest freezer(time), tmp path, faker(random name example)
 def read_excel_file(file_path_operations: str = default_file_path_to_operations) -> pd.DataFrame:
     """Функция принимает путь до EXCEL-файла и возвращает DataFrame"""
     try:
-        logger.info(f"Попытка прочтения файла: {file_path_operations[-19::]}")
+        logger.info(f"Попытка прочтения файла: {file_path_operations[-21::]}")
         operations = pd.read_excel(file_path_operations)
         logger.info("Файл успешно записан в формат DataFrame")
         return operations
@@ -38,7 +37,7 @@ def filter_transactions_by_date(transactions: pd.DataFrame, date_str: str) -> pd
     фильтрует транзакции с начала месяца, на который выпадает входящая дата по входящую дату."""
     logger.info(f"Фильтрую транзакции по дате {date_str}")
 
-    date = datetime.datetime.strptime(date_str, "%d.%m.%Y")
+    date = datetime.datetime.strptime(date_str, "%d.%m.%Y %H:%M:%S")
 
     transactions["Дата операции"] = pd.to_datetime(
         transactions["Дата операции"], format="%d.%m.%Y %H:%M:%S", errors="coerce"

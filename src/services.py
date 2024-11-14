@@ -7,14 +7,14 @@ from src.utils import read_excel_file
 
 transactions = read_excel_file()
 
-logger = setup_logger("services", "../logs/services")
+logger = setup_logger("services")
 
 
 def investment_bank(month: str, transactions: list[dict[Hashable, Any]], limit: int) -> float:
     """На вход принимаем месяц, транзакции, кратная сумма, до которой округляем.
     Каждая покупка округляется до кратной суммы"""
     date = datetime.datetime.strptime(month, "%Y-%m")
-    logger.info(f"Запускаю расчет инвесткопилки для месяца {date.month} с лимитом {limit}")
+    logger.info(f"Запускаю расчет инвесткопилки для месяца {datetime.datetime.strftime(date, "%B")} с лимитом {limit}")
     sum_investment_bank = 0.0
 
     for transaction in transactions:
@@ -26,8 +26,10 @@ def investment_bank(month: str, transactions: list[dict[Hashable, Any]], limit: 
             if payment < 0 and transaction["Категория"] != "Переводы" and transaction["Категория"] != "Наличные":
 
                 rounded_payment = math.ceil(payment / limit) * limit
-                sum_investment_bank += abs(rounded_payment)
+                sum_investment_bank += round(abs(rounded_payment - payment), 1)
 
-    logger.info(f"Расчеты завершены. Сумма накоплений за {date.month} месяц составила бы {sum_investment_bank}")
+    logger.info(
+        f"Готово. Сумма накоплений за {datetime.datetime.strftime(date, "%B")} месяц составила {sum_investment_bank}"
+    )
 
     return sum_investment_bank

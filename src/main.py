@@ -4,7 +4,7 @@ from src.views import main_page
 
 if __name__ == "__main__":
     # Web services
-    web_info = main_page("31.07.2020")
+    web_info = main_page("31.07.2020 12:30:50")
     print(web_info)
 
     # Services
