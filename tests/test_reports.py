@@ -1,9 +1,11 @@
 import json
+from datetime import datetime
 from pathlib import Path
+from unittest.mock import Mock, patch
 
 import pandas as pd
 
-from src.reports import spending_by_category, report_write_to_file, func_operation_reports
+from src.reports import spending_by_category
 
 
 def test_spending_by_category(tmp_path: Path, sample_transactions_to_decorator: pd.DataFrame) -> None:
@@ -48,3 +50,9 @@ def test_report_write_to_file(tmp_path: Path, sample_transactions_to_decorator: 
 
         # Сравниваем JSON-строки
         assert expected_json == file_content_json
+
+
+@patch("datetime.datetime")
+def test_spending_by_category_without_time(mock_time: Mock, sample_transactions_to_decorator: pd.DataFrame) -> None:
+    mock_time.now.return_value = datetime(2024, 12, 12)
+    assert len(spending_by_category(sample_transactions_to_decorator, "Супермаркеты")) == 3

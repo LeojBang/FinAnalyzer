@@ -13,21 +13,6 @@ func_operation_reports = os.path.join(REPORTS_DIR, "func_operation.json")
 default_path_func_operation_reports = os.path.join(REPORTS_DIR, "default_func_operation_report.json")
 
 
-def report_write_to_default_file(func: Callable) -> Callable:
-    """Записывает результат оборачиваемой функции в файл по умолчанию."""
-
-    def wrapper(*args: tuple, **kwargs: dict) -> Any:
-        result = func(*args, **kwargs)
-        with open(f"{default_path_func_operation_reports}", "w") as file:
-            logger.info(
-                f"Записываю получившийся результат функции {func.__name__} в файл default_func_operation_report.json"
-            )
-            result.to_json(file, orient="records", force_ascii=False, indent=4)
-        return result
-
-    return wrapper
-
-
 def report_write_to_file(file_path: str | None = None) -> Callable:
     """Записывает в переданный файл результат, который возвращает функция, формирующая отчет."""
 
@@ -35,16 +20,12 @@ def report_write_to_file(file_path: str | None = None) -> Callable:
         @wraps(func)
         def wrapper(*args: tuple, **kwargs: dict) -> Any:
             result = func(*args, **kwargs)
-            if file_path:
-                logger.info(f"Записываю получившийся результат функции {func.__name__} в файл {file_path}")
-                result.to_json(file_path, orient="records", force_ascii=False, indent=4)
-                return result
-            else:
-                logger.info(
-                    f"Получившийся результат функции {func.__name__} в файл {default_path_func_operation_reports}"
-                )
-                result.to_json(default_path_func_operation_reports, orient="records", force_ascii=False, indent=4)
-                return result
+            path_to_save = (
+                file_path if file_path else default_path_func_operation_reports
+            )
+            logger.info(f"Записываю получившийся результат функции {func.__name__} в файл {file_path}")
+            result.to_json(path_to_save, orient="records", force_ascii=False, indent=4)
+            return result
 
         return wrapper
 

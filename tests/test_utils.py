@@ -22,6 +22,7 @@ def test_read_excel_file_invalid_path_file() -> None:
     with pytest.raises(FileNotFoundError):
         read_excel_file("test_path.xlsx")
 
+
 @pytest.mark.parametrize(
     "hour, expected_greeting",
     [
@@ -30,10 +31,10 @@ def test_read_excel_file_invalid_path_file() -> None:
         (datetime(2024, 12, 1, 4), "Доброй ночи"),
         (datetime(2024, 12, 1, 6), "Доброе утро"),
     ],
-    ids=["Приветствие днем","Приветствие вечером","Приветствие ночью","Приветствие утром"]
+    ids=["Приветствие днем", "Приветствие вечером", "Приветствие ночью", "Приветствие утром"],
 )
 @patch("datetime.datetime")
-def test_get_greeting(mock_date: Mock,hour: datetime,expected_greeting: str) -> None:
+def test_get_greeting(mock_date: Mock, hour: datetime, expected_greeting: str) -> None:
     mock_date.now.return_value = hour
     assert get_greeting() == expected_greeting
 
